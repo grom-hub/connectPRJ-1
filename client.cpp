@@ -40,7 +40,10 @@ int main()
     recv(sock, buf, 1024, 0);  
     std::cout << buf << std::endl;
 
-
-    close(sock);
+    if(shutdown(sock, SHUT_RDWR) == 0)
+        std::cout << "Shutdown - OK" << std::endl;
+    if(close(sock) == 0)
+        std::cout << "Close - OK" << std::endl;
+    
     return 0;
 }

@@ -29,7 +29,7 @@ int main()
     addr.sin_port = htons(3425);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    bind(listener, (struct sockaddr *)&addr, sizeof(addr));
+    bind(listener, (struct sockaddr *)&addr, sizeof(addr)); // Привязка сокета к адресу.
 
     listen(listener, 1);
 
@@ -52,11 +52,15 @@ int main()
             data dt = *((data *)&buf);
             std::cout << "Message form client: " << dt.x  << " - " << dt.y << std::endl; // Мой вывод.
             
-            char a[] = "OK";
-            send(sock, &a, sizeof(2), 0);
+            char a[] = "OTVET";
+            send(sock, &a, 5, 0);
         }
-    
-        close(sock);
+
+        if(shutdown(sock, SHUT_RDWR) == 0)
+            std::cout << "Shutdown - OK" << std::endl;
+        if(close(sock) == 0)
+            std::cout << "Close - OK" << std::endl;
+        
     }
     
     return 0;
