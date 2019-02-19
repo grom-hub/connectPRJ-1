@@ -7,36 +7,40 @@
 #include <unistd.h>
 #include <iostream>
 
-char message[] = "Hello there!\n";
-char buf[sizeof(message)];
+
+
+struct data
+{
+    int x;
+    int y;
+};
+
 
 int main()
 {
     int sock;
     struct sockaddr_in addr;
+    char buf[1024];
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    if(sock < 0)
-    {
-        perror("socket");
-        exit(1);
-    }
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(3425); // или любой другой порт...
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    if(connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-    {
-        perror("connect");
-        exit(2);
-    }
 
-    send(sock, message, sizeof(message), 0);
-    recv(sock, buf, sizeof(message), 0);
-    
-    //printf(buf);
-    std::cout << buf; // Заменил printf.
+    connect(sock, (struct sockaddr *)&addr, sizeof(addr));
+   
+    data dt;
+    dt.x = 123;
+    dt.y = 456;
+
+    send(sock, &dt, sizeof(data), 0);
+    //   const void *msg
+
+    recv(sock, buf, 1024, 0);  
+    std::cout << buf << std::endl;
+
+
     close(sock);
-
     return 0;
 }

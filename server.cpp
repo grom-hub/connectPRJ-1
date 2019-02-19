@@ -7,6 +7,15 @@
 #include <unistd.h>
 #include <iostream>
 
+
+
+struct data
+{
+    int x;
+    int y;
+};
+
+
 int main()
 {
     int sock, listener;
@@ -15,38 +24,36 @@ int main()
     int bytes_read;
 
     listener = socket(AF_INET, SOCK_STREAM, 0);
-    if(listener < 0)
-    {
-        perror("socket");
-        exit(1);
-    }
     
     addr.sin_family = AF_INET;
     addr.sin_port = htons(3425);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if(bind(listener, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-    {
-        perror("bind");
-        exit(2);
-    }
+
+    bind(listener, (struct sockaddr *)&addr, sizeof(addr));
 
     listen(listener, 1);
-    
+
     while(1)
     {
+        std::cout << "Wait for accept...\n";
+
         sock = accept(listener, NULL, NULL);
-        if(sock < 0)
-        {
-            perror("accept");
-            exit(3);
-        }
+
+        std::cout << "accept!\n";
 
         while(1)
         {
             bytes_read = recv(sock, buf, 1024, 0);
+
+            std::cout << "bytes_read = " <<bytes_read << std::endl;
+
             if(bytes_read <= 0) break;
-            send(sock, buf, bytes_read, 0);
-            std::cout << buf; // Мой вывод.
+
+            data dt = *((data *)&buf);
+            std::cout << "Message form client: " << dt.x  << " - " << dt.y << std::endl; // Мой вывод.
+            
+            char a[] = "OK";
+            send(sock, &a, sizeof(2), 0);
         }
     
         close(sock);
